@@ -109,7 +109,7 @@ Complete these steps:
    nano .env
    ```
 
-3. Write an arbitrary value for `QWEN_API_KEY`.
+3. Write an arbitrary value for `QWEN_CODE_API_KEY`.
 
    This key will protect your `Qwen Code` API.
 
@@ -137,12 +137,12 @@ Complete these steps:
    cat ~/qwen-code-api/.env | grep HOST_PORT
    ```
 
-3. To get the value of `QWEN_API_KEY` in `.env`,
+3. To get the value of `QWEN_CODE_API_KEY` in `.env`,
 
    [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
 
    ```terminal
-   cat ~/qwen-code-api/.env | grep QWEN_API_KEY
+   cat ~/qwen-code-api/.env | grep QWEN_CODE_API_KEY
    ```
 
 ### Check that the `Qwen Code` API is accessible (REMOTE or LOCAL)
@@ -150,7 +150,7 @@ Complete these steps:
 1. [Get the `Qwen Code` API config values (REMOTE)](#get-the-qwen-code-api-config-values-remote):
 
    - `HOST_PORT`
-   - `QWEN_API_KEY`
+   - `QWEN_CODE_API_KEY`
 
 2. To send an [`HTTP` request](./http.md#http-request) to the [`Qwen Code` API](#what-is-qwen-code-api),
 
@@ -170,7 +170,7 @@ Complete these steps:
      - `localhost` (REMOTE)
      - [`<your-vm-ip-address>`](vm.md#your-vm-ip-address-placeholder) (LOCAL)
    - `<qwen-code-api-port>` with the value of `HOST_PORT`
-   - `<qwen-api-key>` with the value of `QWEN_API_KEY`
+   - `<qwen-api-key>` with the value of `QWEN_CODE_API_KEY`
    - `<qwen-model>` with one of the [available models](./qwen-code.md#view-available-models)
 
 3. When you run it, the output should be similar to this:
