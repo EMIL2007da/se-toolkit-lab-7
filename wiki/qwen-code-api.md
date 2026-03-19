@@ -4,6 +4,7 @@
 
 - [What is `Qwen Code` API](#what-is-qwen-code-api)
 - [`Qwen Code` API key](#qwen-code-api-key)
+  - [`<qwen-code-api-key>` placeholder](#qwen-code-api-key-placeholder)
 - [`Qwen Code` API host port](#qwen-code-api-host-port)
   - [`<qwen-code-api-host-port>` placeholder](#qwen-code-api-host-port-placeholder)
 - [`Qwen Code` API base URL](#qwen-code-api-base-url)
@@ -25,6 +26,10 @@ The [API key](./web-api.md#api-key) that is used to authorize requests to the [`
 The key should follow the [API key format](./web-api.md#api-key-format).
 
 You store the key in [`QWEN_CODE_API_KEY`](./qwen-code-api-dotenv-secret.md#qwen_code_api_key) in [`qwen-code-api/.env.secret`](./qwen-code-api-dotenv-secret.md#qwen_code_api_key).
+
+### `<qwen-code-api-key>` placeholder
+
+The [`Qwen Code` API key](#qwen-code-api-key) (without `<` and `>`).
 
 ## `Qwen Code` API host port
 
