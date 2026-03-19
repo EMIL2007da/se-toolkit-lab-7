@@ -11,6 +11,7 @@
   - [Set up the `GitHub Copilot Chat` extension for `VS Code`](#set-up-the-github-copilot-chat-extension-for-vs-code)
 - [Set up the `Qwen Code` CLI (REMOTE)](#set-up-the-qwen-code-cli-remote)
 - [Check the `Qwen Code` credentials file](#check-the-qwen-code-credentials-file)
+- [Copy the `Qwen Code` credentials file to the VM (LOCAL)](#copy-the-qwen-code-credentials-file-to-the-vm-local)
 - [Open a chat with `Qwen Code`](#open-a-chat-with-qwen-code)
   - [Open a chat with `Qwen Code` using the CLI](#open-a-chat-with-qwen-code-using-the-cli)
   - [Open a chat with `Qwen Code` using the `Qwen Code Companion` extension for `VS Code`](#open-a-chat-with-qwen-code-using-the-qwen-code-companion-extension-for-vs-code)
@@ -158,6 +159,24 @@ Path: `~/.qwen/oauth_creds.json`.
      "resource_url": "portal.qwen.ai",
      "expiry_date": 1773502586930
    }
+   ```
+
+## Copy the `Qwen Code` credentials file to the VM (LOCAL)
+
+1. [Set up the `Qwen Code` CLI (LOCAL)](#set-up-the-qwen-code-cli).
+
+2. To copy the [`Qwen Code` credentials file](#qwen-code-credentials-file) to the VM,
+
+   [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
+
+   ```terminal
+   scp ~/.qwen/oauth_creds.json se-toolkit-vm:~/.qwen/oauth_creds.json
+   ```
+
+   The output should look similar to this:
+
+   ```terminal
+   oauth_creds.json             100%  313   201.4KB/s   00:00    
    ```
 
 ## Open a chat with `Qwen Code`
