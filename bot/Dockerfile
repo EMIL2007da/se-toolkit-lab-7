@@ -15,8 +15,8 @@ COPY pyproject.toml uv.lock ./
 # Install dependencies using uv
 RUN uv sync --frozen --no-dev
 
-# Copy bot source code
-COPY bot/ ./bot/
+# Copy bot source code directly to /app
+COPY bot/ /app/
 
 # Set environment variables
 ENV PYTHONPATH=/app
@@ -24,4 +24,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Run the bot
-CMD ["uv", "run", "python", "-m", "bot.bot"]
+CMD ["uv", "run", "python", "-m", "bot"]
