@@ -78,13 +78,13 @@ def run_test_mode(command_input: str) -> None:
     # Check if it's a natural language query
     if is_natural_language_query(command_input):
         response = handle_natural_language(command_input)
+        print(response)
     else:
         response = handle_slash_command(command_input)
+        format_response(response)
 
-    print(response)
 
-
-def handle_slash_command(command_input: str) -> str:
+def handle_slash_command(command_input: str) -> str | dict:
     """
     Handle a slash command.
 
@@ -92,7 +92,7 @@ def handle_slash_command(command_input: str) -> str:
         command_input: Slash command string
 
     Returns:
-        Response text
+        Response text or dict with keyboard
     """
     command, argument = parse_command(command_input)
 
@@ -104,6 +104,26 @@ def handle_slash_command(command_input: str) -> str:
     if command == "/scores" and argument:
         return handle_scores(lab=argument)
     return handler()
+
+
+def format_response(response: str | dict) -> None:
+    """
+    Print response to stdout.
+
+    Args:
+        response: String or dict with keyboard
+    """
+    if isinstance(response, dict):
+        # Response with inline keyboard
+        print(response.get("text", ""))
+        if "reply_markup" in response:
+            keyboard = response["reply_markup"].get("inline_keyboard", [])
+            print("\n[Inline Keyboard]:")
+            for row in keyboard:
+                for button in row:
+                    print(f"  - {button.get('text', '')}")
+    else:
+        print(response)
 
 
 def handle_natural_language(query: str) -> str:
