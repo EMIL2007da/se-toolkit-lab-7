@@ -182,10 +182,105 @@ Examples:
     if args.test:
         run_test_mode(args.test)
     else:
-        # Telegram mode — will be implemented after handlers are ready
-        print("🤖 Telegram mode not yet implemented.")
-        print("Use --test mode for now: uv run bot.py --test '/start'")
-        sys.exit(0)
+        # Telegram mode
+        run_telegram_mode()
+
+
+def run_telegram_mode() -> None:
+    """Run the bot in Telegram mode."""
+    try:
+        from aiogram import Bot, Dispatcher, types
+        from aiogram.filters import Command, CommandStart
+        from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+    except ImportError:
+        print("❌ aiogram not installed. Install with: uv add aiogram")
+        sys.exit(1)
+
+    if not settings.bot_token:
+        print("❌ BOT_TOKEN is not set in .env.bot.secret")
+        sys.exit(1)
+
+    # Initialize bot and dispatcher
+    bot = Bot(token=settings.bot_token)
+    dp = Dispatcher()
+
+    print(f"✅ Bot started. Polling for messages...")
+
+    # /start handler
+    @dp.message(CommandStart())
+    async def cmd_start(message: types.Message) -> None:
+        """Handle /start command."""
+        response = handle_start()
+        keyboard = build_inline_keyboard(response.get("reply_markup", {}))
+        await message.answer(response.get("text", ""), reply_markup=keyboard)
+
+    # /help handler
+    @dp.message(Command("help"))
+    async def cmd_help(message: types.Message) -> None:
+        """Handle /help command."""
+        response = handle_help()
+        await message.answer(response)
+
+    # /health handler
+    @dp.message(Command("health"))
+    async def cmd_health(message: types.Message) -> None:
+        """Handle /health command."""
+        response = handle_health()
+        await message.answer(response)
+
+    # /labs handler
+    @dp.message(Command("labs"))
+    async def cmd_labs(message: types.Message) -> None:
+        """Handle /labs command."""
+        response = handle_labs()
+        await message.answer(response)
+
+    # /scores handler
+    @dp.message(Command("scores"))
+    async def cmd_scores(message: types.Message) -> None:
+        """Handle /scores command."""
+        if message.text:
+            # Extract lab argument
+            parts = message.text.split(maxsplit=1)
+            lab = parts[1] if len(parts) > 1 else None
+            response = handle_scores(lab=lab)
+        else:
+            response = handle_scores(lab=None)
+        await message.answer(response)
+
+    # Handle natural language messages
+    @dp.message()
+    async def handle_message(message: types.Message) -> None:
+        """Handle natural language queries."""
+        if message.text:
+            response = handle_natural_language(message.text)
+            await message.answer(response)
+
+    # Build inline keyboard from reply_markup
+    def build_inline_keyboard(reply_markup: dict) -> InlineKeyboardMarkup | None:
+        """Build inline keyboard from reply_markup dict."""
+        if not reply_markup:
+            return None
+        keyboard_rows = reply_markup.get("inline_keyboard", [])
+        if not keyboard_rows:
+            return None
+        keyboard = []
+        for row in keyboard_rows:
+            keyboard_row = []
+            for button in row:
+                keyboard_row.append(
+                    InlineKeyboardButton(
+                        text=button.get("text", ""),
+                        callback_data=button.get("callback_data", ""),
+                    )
+                )
+            keyboard.append(keyboard_row)
+        return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+    # Run polling
+    import asyncio
+
+    asyncio.run(dp.start_polling(bot))
 
 
 if __name__ == "__main__":
