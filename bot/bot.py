@@ -8,6 +8,7 @@ Supports two modes:
 
 Usage:
     uv run bot.py --test "/start"     # Test mode
+    uv run bot.py --test "what labs are available"  # Natural language
     uv run bot.py                     # Telegram mode
 """
 
@@ -21,6 +22,11 @@ from handlers import (
     handle_labs,
     handle_scores,
 )
+from handlers.intent_router import IntentRouter
+from services.llm_client import LlmClient
+from services.lms_api import LmsApiClient
+from services.tools_service import ToolsService
+from config import settings
 
 
 # Command routing: maps command strings to handler functions
@@ -49,28 +55,83 @@ def parse_command(input_text: str) -> tuple[str, str | None]:
     return command, argument
 
 
-def run_test_mode(command_input: str) -> None:
+def is_natural_language_query(input_text: str) -> bool:
     """
-    Run a command in test mode — call handler directly and print result.
+    Check if input is a natural language query (not a slash command).
 
     Args:
-        command_input: Command string (e.g., "/start" or "/scores lab-04")
+        input_text: Raw user input
+
+    Returns:
+        True if natural language, False if slash command
+    """
+    return not input_text.strip().startswith("/")
+
+
+def run_test_mode(command_input: str) -> None:
+    """
+    Run a command in test mode — call handler directly or use LLM routing.
+
+    Args:
+        command_input: Command string or natural language query
+    """
+    # Check if it's a natural language query
+    if is_natural_language_query(command_input):
+        response = handle_natural_language(command_input)
+    else:
+        response = handle_slash_command(command_input)
+
+    print(response)
+
+
+def handle_slash_command(command_input: str) -> str:
+    """
+    Handle a slash command.
+
+    Args:
+        command_input: Slash command string
+
+    Returns:
+        Response text
     """
     command, argument = parse_command(command_input)
 
     handler = COMMANDS.get(command)
     if not handler:
-        print(f"❌ Unknown command: {command}")
-        print(f"Available commands: {', '.join(COMMANDS.keys())}")
-        sys.exit(0)
+        return f"❌ Unknown command: {command}\nAvailable commands: {', '.join(COMMANDS.keys())}"
 
     # Call handler with appropriate arguments
     if command == "/scores" and argument:
-        response = handle_scores(lab=argument)
-    else:
-        response = handler()
+        return handle_scores(lab=argument)
+    return handler()
 
-    print(response)
+
+def handle_natural_language(query: str) -> str:
+    """
+    Handle a natural language query using LLM intent routing.
+
+    Args:
+        query: Natural language query
+
+    Returns:
+        Response text
+    """
+    # Check if LLM is configured
+    if not settings.llm_api_key or not settings.llm_api_base_url:
+        return "⚠️ LLM is not configured. Please set LLM_API_KEY and LLM_API_BASE_URL in .env.bot.secret"
+
+    # Initialize clients
+    api_client = LmsApiClient(settings.lms_api_base_url, settings.lms_api_key)
+    llm_client = LlmClient(
+        settings.llm_api_base_url, settings.llm_api_key, settings.llm_api_model
+    )
+    tools_service = ToolsService(api_client)
+    router = IntentRouter(llm_client, tools_service)
+
+    try:
+        return router.route(query)
+    except Exception as e:
+        return f"❌ Error processing query: {e}"
 
 
 def main() -> None:
@@ -85,12 +146,15 @@ Examples:
     uv run bot.py --test "/health"
     uv run bot.py --test "/labs"
     uv run bot.py --test "/scores lab-04"
+    uv run bot.py --test "what labs are available?"
+    uv run bot.py --test "show me scores for lab 4"
+    uv run bot.py --test "which lab has the lowest pass rate?"
 """,
     )
     parser.add_argument(
         "--test",
         metavar="COMMAND",
-        help="Run in test mode with the given command",
+        help="Run in test mode with the given command (slash command or natural language)",
     )
 
     args = parser.parse_args()
