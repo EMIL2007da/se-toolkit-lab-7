@@ -26,11 +26,15 @@ def handle_scores(lab: str | None = None, user_id: int | None = None) -> str:
         # Try pass-rates endpoint first
         pass_rates = client.get_pass_rates(lab)
 
-        if not pass_rates:
+        # Check for empty list or empty dict
+        if not pass_rates or (isinstance(pass_rates, list) and len(pass_rates) == 0):
             # Fallback to scores endpoint
             scores = client.get_scores(lab)
-            if scores:
-                return format_scores_response(lab, scores)
+            if scores and isinstance(scores, list) and len(scores) > 0:
+                # Check if all buckets have zero count (non-existent lab)
+                total_count = sum(bucket.get("count", 0) for bucket in scores)
+                if total_count > 0:
+                    return format_scores_response(lab, scores)
             return f"📊 No scores found for {lab}. Check the lab identifier."
 
         return format_pass_rates_response(lab, pass_rates)

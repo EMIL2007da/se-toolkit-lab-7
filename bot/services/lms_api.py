@@ -46,13 +46,13 @@ class LmsApiClient:
 
         Returns:
             List of item dictionaries
+
+        Raises:
+            httpx.RequestError: If the backend is unreachable
         """
-        try:
-            response = self._client.get("/items/")
-            response.raise_for_status()
-            return response.json()
-        except httpx.RequestError:
-            return []
+        response = self._client.get("/items/")
+        response.raise_for_status()
+        return response.json()
 
     def get_scores(self, lab: str) -> dict:
         """
