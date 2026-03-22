@@ -1,7 +1,7 @@
 # Bot Dockerfile — builds the Telegram bot container
 # Uses uv for dependency management (no pip, no requirements.txt)
 
-FROM python:3.14-slim
+FROM python:3.14.2-slim
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
