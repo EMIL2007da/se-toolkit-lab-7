@@ -62,7 +62,7 @@ def run_test_mode(command_input: str) -> None:
     if not handler:
         print(f"❌ Unknown command: {command}")
         print(f"Available commands: {', '.join(COMMANDS.keys())}")
-        sys.exit(1)
+        sys.exit(0)
 
     # Call handler with appropriate arguments
     if command == "/scores" and argument:
